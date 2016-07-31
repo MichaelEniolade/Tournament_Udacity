@@ -4,136 +4,136 @@
 
 from tournament import *
 
-def sampleDeleteMatches():
+def testDeleteMatches():
     deleteMatches()
-    print "1. Old matches can be deleted."
+    print "1. Delete Old matches."
 
 
-def sampleDelete():
+def testDelete():
     deleteMatches()
-    deletePlayers()
-    print "2. Player records can be deleted."
+    deletegamers()
+    print "2. Delete gamer records."
 
 
-def sampleCount():
+def testCount():
     deleteMatches()
-    deletePlayers()
-    c = countPlayers()
-    if c == '0':
+    deletegamers()
+    k = countgamers()
+    if k == '0':
         raise TypeError(
-            "countPlayers() should return numeric zero, not string '0'.")
-    if c != 0:
-        raise ValueError("After deleting, countPlayers should return zero.")
-    print "3. After deleting, countPlayers() returns zero."
+            "countgamers() should return numeric zero, not string '0'.")
+    if k != 0:
+        raise ValueError("After deleting, countgamers should return zero.")
+    print "3. After deleting, countgamers() returns zero."
 
 
-def sampleRegister():
+def testRegister():
     deleteMatches()
-    deletePlayers()
-    registerPlayer("Wisdom Eniolade")
-    c = countPlayers()
-    if c != 1:
+    deletegamers()
+    registergamer("Michael Eniolade")
+    k = countgamers()
+    if k != 1:
         raise ValueError(
-            "After one player registers, countPlayers() should be 1.")
-    print "4. After registering a player, countPlayers() returns 1."
+            "After one gamer registers, countgamers() should be 1.")
+    print "4. After registering a gamer, countgamers() returns 1."
 
 
-def sampleRegisterCountDelete():
+def testRegisterCountDelete():
     deleteMatches()
-    deletePlayers()
-    registerPlayer("Muyiwa Kolade")
-    registerPlayer("Peter James")
-    registerPlayer("Bose Rotimi")
-    registerPlayer("Rose John")
-    c = countPlayers()
-    if c != 4:
+    deletegamers()
+    registergamer("Tope Ajayi")
+    registergamer("Titi Malove")
+    registergamer("Jumoke Moses")
+    registergamer("Abigail Violet")
+    k = countgamers()
+    if k != 4:
         raise ValueError(
-            "After registering four players, countPlayers should be 4.")
-    deletePlayers()
-    c = countPlayers()
-    if c != 0:
-        raise ValueError("After deleting, countPlayers should return zero.")
-    print "5. Players can be registered and deleted."
+            "After registering four gamers, countgamers should be 4.")
+    deletegamers()
+    k = countgamers()
+    if k != 0:
+        raise ValueError("After deleting, countgamers should return zero.")
+    print "5. gamers can be registered and deleted."
 
 
-def sampleStandingsBeforeMatches():
+def testslotsBeforeMatches():
     deleteMatches()
-    deletePlayers()
-    registerPlayer("Ayotunde Laura")
-    registerPlayer("Rukky Wane")
-    standings = playerStandings()
-    if len(standings) < 2:
-        raise ValueError("Players should appear in playerStandings even before "
+    deletegamers()
+    registergamer("Albert Abraham")
+    registergamer("Ezekiel Malone")
+    slots = gamerslots()
+    if len(slots) < 2:
+        raise ValueError("gamers should appear in gamerslots even before "
                          "they have played any matches.")
-    elif len(standings) > 2:
-        raise ValueError("Only registered players should appear in standings.")
-    if len(standings[0]) != 4:
-        raise ValueError("Each playerStandings row should have four columns.")
-    [(id1, name1, wins1, matches1), (id2, name2, wins2, matches2)] = standings
+    elif len(slots) > 2:
+        raise ValueError("Only registered gamers should appear in slots.")
+    if len(slots[0]) != 4:
+        raise ValueError("Each gamerslots row should have four columns.")
+    [(id1, name1, wins1, matches1), (id2, name2, wins2, matches2)] = slots
     if matches1 != 0 or matches2 != 0 or wins1 != 0 or wins2 != 0:
         raise ValueError(
-            "Newly registered players should have no matches or wins.")
-    if set([name1, name2]) != set(["Ayotunde Laura", "Rukky Wane"]):
-        raise ValueError("Registered players' names should appear in standings, "
+            "Newly registered gamers should have no matches or wins.")
+    if set([name1, name2]) != set(["Albert Abraham", "Ezekiel Malone"]):
+        raise ValueError("Registered gamers' names should appear in slots, "
                          "even if they have no matches played.")
-    print "6. Newly registered players appear in the standings with no matches."
+    print "6. Newly registered gamers appear in the slots with no matches."
 
 
-def sampleReportMatches():
+def testReportMatches():
     deleteMatches()
-    deletePlayers()
-    registerPlayer("Tope Akintunde")
-    registerPlayer("Yetunde Omiwale")
-    registerPlayer("Bose Atinuke")
-    registerPlayer("Bola Malomo")
-    standings = playerStandings()
-    [id1, id2, id3, id4] = [row[0] for row in standings]
+    deletegamers()
+    registergamer("Kiki Lion")
+    registergamer("Jennifer Williams")
+    registergamer("Gates Lake")
+    registergamer("John Lake")
+    slots = gamerslots()
+    [id1, id2, id3, id4] = [row[0] for row in slots]
     reportMatch(id1, id2)
     reportMatch(id3, id4)
-    standings = playerStandings()
-    for (i, n, w, m) in standings:
+    slots = gamerslots()
+    for (c, n, i, m) in slots:
         if m != 1:
-            raise ValueError("Each player should have one match recorded.")
-        if i in (id1, id3) and w != 1:
+            raise ValueError("Each gamer should have one match recorded.")
+        if c in (id1, id3) and i != 1:
             raise ValueError("Each match winner should have one win recorded.")
-        elif i in (id2, id4) and w != 0:
+        elif c in (id2, id4) and i != 0:
             raise ValueError("Each match loser should have zero wins recorded.")
-    print "7. After a match, players have updated standings."
+    print "7. After a match, gamers have updated slots."
 
 
-def samplePairings():
+def testPairings():
     deleteMatches()
-    deletePlayers()
-    registerPlayer("Jumoke Tunbo")
-    registerPlayer("Peju Ololade")
-    registerPlayer("Robert Sleez")
-    registerPlayer("Rubby Jane")
-    standings = playerStandings()
-    [id1, id2, id3, id4] = [row[0] for row in standings]
+    deletegamers()
+    registergamer("Augustus Caezar")
+    registergamer("Apple Tom")
+    registergamer("Jack Jim")
+    registergamer("Khan Ham")
+    slots = gamerslots()
+    [id1, id2, id3, id4] = [row[0] for row in slots]
     reportMatch(id1, id2)
     reportMatch(id3, id4)
     pairings = swissPairings()
     if len(pairings) != 2:
         raise ValueError(
-            "For four players, swissPairings should return two pairs.")
+            "For four gamers, swissPairings should return two pairs.")
     [(pid1, pname1, pid2, pname2), (pid3, pname3, pid4, pname4)] = pairings
     correct_pairs = set([frozenset([id1, id3]), frozenset([id2, id4])])
     actual_pairs = set([frozenset([pid1, pid2]), frozenset([pid3, pid4])])
     if correct_pairs != actual_pairs:
         raise ValueError(
-            "After one match, players with one win should be paired.")
-    print "8. After one match, players with one win are paired."
+            "After one match, gamers with one win should be paired.")
+    print "8. After one match, gamers with one win are paired."
 
 
 if __name__ == '__main__':
-    sampleDeleteMatches()
-    sampleDelete()
-    sampleCount()
-    sampleRegister()
-    sampleRegisterCountDelete()
-    sampleStandingsBeforeMatches()
-    sampleReportMatches()
-    samplePairings()
-    print "Success!  All samples pass!"
+    testDeleteMatches()
+    testDelete()
+    testCount()
+    testRegister()
+    testRegisterCountDelete()
+    testslotsBeforeMatches()
+    testReportMatches()
+    testPairings()
+    print "Success!  All tests pass!"
 
 
