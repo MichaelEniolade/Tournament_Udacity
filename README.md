@@ -1,6 +1,6 @@
-# Tournament Results
-https://www.udacity.com/course/viewer#!/c-ud197-nd/  
-Udacity Full Stack developer project 2
+# Tournament Game
+
+Udacity Full Stack developer project 
 
 ## Project Specification
 
@@ -21,11 +21,7 @@ Contains the SQL queries to create the database, tables and views
 
 Contains the test cases for tournament.py  
 
-## Prerequisites 
-
-The latest vagrant build for the Udacity tournament project. (In project notes)
-
-## Instructions
+## Key Notes
 
 1. Start Vagrant
   1. Open Terminal or cmd and browse to the vagrant folder
@@ -41,7 +37,7 @@ The latest vagrant build for the Udacity tournament project. (In project notes)
 5. Run the tests
   1. In the terminal type `python tournament_test.py`
 
-## Expected Outcome
+## Expected Results
 
 Success!  All tests pass!  
 vagrant@vagrant-ubuntu-trusty-32:/vagrant/tournament$ python tournament_test.py  
@@ -55,7 +51,5 @@ vagrant@vagrant-ubuntu-trusty-32:/vagrant/tournament$ python tournament_test.py
 8. After one match, players with one win are paired.  
 Success!  All tests pass!  
 
-## Extra Credit
-
-If the top two players have the same won match count, and have won more than 0 games, then 
-the standings is ordered by total number of wins by games played in descending order.
+##Resources
+lots and lots of researches online
