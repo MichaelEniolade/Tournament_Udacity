@@ -1,49 +1,39 @@
--- Table definitions for the tournament project.
---
--- Put your SQL 'create table' statements in this file; also 'create view'
--- statements if you choose to use it.
---
--- You can write comments in this file by starting them with two dashes, like
--- these lines here.
+-- Table definitions for the tournament_game project.
 
--- Drop database;
+-- Drop tournament_game database if it exists
+DROP DATABASE IF EXISTS tournament_game;
 
-DROP DATABASE IF EXISTS tournament;
+-- Create Database 'tournament_game'
+CREATE DATABASE tournament_game;
 
--- Create database.
+-- Connect to the tournament_game database
+\connect tournament_game
 
-CREATE DATABASE tournament;
+-- Drop all tables and views if they exist
+DROP TABLE IF EXISTS gamer CASCADE;
+DROP TABLE IF EXISTS match CASCADE;
+DROP VIEW IF EXISTS slots CASCADE;
 
--- Connect to the DB before creating tables.
-
-\c tournament;
-
--- Create table for players.
-
-CREATE TABLE players (id serial primary key, name text);
-
--- Create table for games.
-
-CREATE TABLE games (
-	game_id serial primary key,
-	winner integer references players(id),
-	loser integer references players(id)
+-- Creates gamer table
+CREATE TABLE gamer(
+  gamer_id serial PRIMARY KEY,
+  gamer_name text
 );
 
--- Create view to show standings.
+-- Creates match table with FK to gamer
+CREATE TABLE match (
+  match_id serial PRIMARY KEY,
+  winplayer INTEGER,
+  loseplayer INTEGER,
+  FOREIGN KEY(winplayer) REFERENCES gamer(gamer_id),
+  FOREIGN KEY(loseplayer) REFERENCES gamer(gamer_id)
+);
 
-CREATE VIEW standings AS
-SELECT players.id, players.name,
-	SUM( CASE WHEN games.winner = players.id THEN 1 ELSE 0 END ) AS wins,
-	count(games.*) AS games
-FROM players LEFT JOIN games
-ON players.id = games.winner OR players.id = games.loser
-GROUP BY players.id;
-
--- Create a view for showing the number of byes per player
-
-CREATE VIEW byes AS
-SELECT players.id, players.name, count(games.winner) AS bye_count
-FROM players LEFT JOIN games
-ON players.id = games.winner AND games.loser IS NULL
-GROUP BY players.id;
+-- Creates a view of matches played sorted by wonplayer count
+CREATE VIEW slots AS
+SELECT p.gamer_id as gamer_id, p.gamer_name,
+(SELECT count(*) FROM match WHERE match.winplayer = p.gamer_id) as wonplayer,
+(SELECT count(*) FROM match WHERE p.gamer_id in (winplayer, loseplayer)) as played
+FROM gamer p
+GROUP BY p.gamer_id
+ORDER BY wonplayer DESC;
