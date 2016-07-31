@@ -1,189 +1,125 @@
 #!/usr/bin/env python
 # 
-# tournament.py -- implementation of a Swiss-system tournament
+# tournament makes use of a Swiss-system 
 #
 
 import psycopg2
-
+import bleach
 
 def connect():
-    """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    """to connect to the tournament database"""
+    return psycopg2.connect("dbname=tournament_game")
 
 
 def deleteMatches():
-    """Remove all the match records from the database."""
-    db = connect()
-    c = db.cursor()
-    c.execute("DELETE FROM games")
-    db.commit()
-    db.close
+    """this is to remove all match records from the database"""
+    connection = connect()
+    cursor = connection.cursor()
+    sqlquery = "DELETE FROM match"
+    cursor.execute(sqlquery)
+    connection.commit()
+    connection.close()
 
-def deletePlayers():
-    """Remove all the player records from the database."""
-    db = connect()
-    c = db.cursor()
-    c.execute("DELETE FROM players")
-    db.commit()
-    db.close
 
-def countPlayers():
-    """Returns the number of players currently registered."""
-    db = connect()
-    c = db.cursor()
-    c.execute("SELECT count(*) AS num FROM players")
-    count = c.fetchone()[0]
-    db.close
+def deletegamers():
+    """this is to remove the gamer records from the database."""
+    connection = connect()
+    cursor = connection.cursor()
+    sqlquery = "DELETE FROM gamer"
+    cursor.execute(sqlquery)
+    connection.commit()
+    connection.close()
+
+
+def countgamers():
+    """this is to display the number of registered gamers."""
+    connection = connect()
+    cursor = connection.cursor()
+    sqlquery = "SELECT COUNT(*) FROM gamer"
+    cursor.execute(sqlquery)
+    count = cursor.fetchone()[0]
+    connection.close()
     return count
 
-def registerPlayer(name):
-    """Adds a player to the tournament database.
-  
-    The database assigns a unique serial id number for the player.  (This
-    should be handled by your SQL database schema, not in your Python code.)
-  
-    Args:
-      name: the player's full name (need not be unique).
+
+def registergamer(name):
+    """this adds a new gamer to the tournament database.
+    NB : The database assigns a unique serial id number for the gamer. 
     """
-    db = connect()
-    c = db.cursor()
-    query = "INSERT INTO players (name) VALUES (%s);"
-    args = (name,)
-    c.execute(query, args)
-    db.commit()
-    db.close
 
-def playerStandings():
-    """Returns a list of the players and their win records, sorted by wins.
+    connection = connect()
+    cursor = connection.cursor()
+    bleached_name = bleach.clean(name, strip=True)
+    cursor.execute("insert into gamer (gamer_name) values (%s)", (bleached_name,))
+    connection.commit()
+    connection.close()
 
-    The first entry in the list should be the player in first place, or a player
+
+def gamerslots():
+    """this returns a list of gamers and their win records in a sorted manner.
+
+    The first entry in the list should be the gamer in first place, or a gamer
     tied for first place if there is currently a tie.
 
-    Returns:
-      A list of tuples, each of which contains (id, name, wins, matches):
-        id: the player's unique id (assigned by the database)
-        name: the player's full name (as registered)
-        wins: the number of matches the player has won
-        matches: the number of matches the player has played
+    this will give:
+        id: the gamer's unique id (assigned by the database)
+        name: the gamer's full name (as registered)
+        wins: the number of matches the gamer has won
+        matches: the number of matches the gamer has played
     """
-    db = connect()
-    c = db.cursor()
-    c.execute("SELECT * FROM standings ORDER BY wins DESC;")
-    standings = c.fetchall()
-    db.close()
-    return standings
+    connection = connect()
+    cursor = connection.cursor()
+    sqlquery = "SELECT * FROM slots;"
+    cursor.execute(sqlquery)
+    outcome = cursor.fetchall()
+    # If the top two outcome have more than 0 wins AND are equal then reorder them
+    # by total wins divided by total games played
+    if (outcome[0][2] != 0) and (outcome[0][2] == outcome[1][2]):
+        sqlquery = "SELECT gamer_id, gamer_name, wonplayer, played " \
+                "FROM slots ORDER BY (cast(wonplayer AS DECIMAL)/played)  DESC;"
+        cursor.execute(sqlquery)
+        outcome = cursor.fetchall()
+    connection.close()
 
-def reportMatch(winner, loser):
-    """Records the outcome of a single match between two players.
+    return outcome
 
-    Args:
-      winner:  the id number of the player who won
-      loser:  the id number of the player who lost
+
+def reportMatch(winplayer, loseplayer):
+    """Records the outcome of a single match between two gamers.
+
+    method parameters:
+      winner: this is the id number of the gamer who won
+      loser:  this is the id number of the gamer who lost
     """
-    db = connect()
-    c = db.cursor()
-    query = "INSERT INTO games (winner, loser) VALUES (%s, %s);"
-    args = (winner, loser,)
-    c.execute(query, args)
-    db.commit()
-    db.close()
- 
+    connection = connect()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO match (winplayer, loseplayer) VALUES (%s, %s)", (winplayer, loseplayer,))
+    connection.commit()
+    connection.close()
+
+
 def swissPairings():
-    """Returns a list of pairs of players for the next round of a match.
-  
-    Assuming that there are an even number of players registered, each player
-    appears exactly once in the pairings.  Each player is paired with another
-    player with an equal or nearly-equal win record, that is, a player adjacent
-    to him or her in the standings.
-  
-    Returns:
-      A list of tuples, each of which contains (id1, name1, id2, name2)
-        id1: the first player's unique id
-        name1: the first player's name
-        id2: the second player's unique id
-        name2: the second player's name
+    """ this is to create a list of pairs of gamers for the next round of a match.
+
+    below is what is returned :
+        id1: the first gamer's unique id
+        name1: the first gamer's name
+        id2: the second gamer's unique id
+        name2: the second gamer's name
     """
-    # Set up our variables for pairs, player getting a bye, and the bye pairing
-    pairs = []
-    byePlayer = False
-    byePair = False
 
-    # Use the playerStandings function to get our standings.
-    standings = playerStandings()
-    num_players = len(standings)
+    connection = connect()
+    cursor = connection.cursor()
+    sqlquery = "SELECT * FROM slots"
+    cursor.execute(sqlquery)
+    outcome = cursor.fetchall()
+    pairings = []
+    count = len(outcome)
 
-    # If we have an odd number of players, we have to assign a bye
-    if 0 != num_players % 2:
-        byePlayer = assignBye()
+    for x in range(0, count - 1, 2):
+        paired_list = (outcome[x][0], outcome[x][1], outcome[x + 1][0], outcome[x + 1][1])
+        pairings.append(paired_list)
 
-    # Loop through every other player in the standings and pair them with
-    # the next adjacent player, handle byes when we encounter them.
-    i = 0
-    while i < num_players:
-        # If we have a bye and it's been assigned to one of the next two
-        # players in the standings, then pair the bye accordingly.
-        if byePlayer and (byePlayer[0] == standings[i][0] or
-           byePlayer[0] == standings[i+1][0]):
-
-            # If the first player in the loop has a bye, create the bye pairing
-            # and pair the next two players in the standings
-            if byePlayer[0] == standings[i][0]:
-                # Our bye pairing
-                byePair = (
-                    standings[i][0],
-                    standings[i][1],
-                    '',
-                    "bye"
-                )
-
-                # Skip ahead one since we've only paired one and start over.
-                i += 1
-                continue
-
-            # If the second player in the loop has a bye, pair the first and
-            # third players and create the bye pair with the second player.
-            elif byePlayer[0] == standings[i+1][0]:
-                # Our next pair
-                pair = (
-                    standings[i][0],
-                    standings[i][1],
-                    standings[i+2][0],
-                    standings[i+2][1]
-                )
-
-                # Our bye pairing
-                byePair = (
-                    standings[i+1][0],
-                    standings[i+1][1],
-                    '',
-                    "bye"
-                )
-
-                # Skip ahead three since we've paired three players
-                i += 3
-
-        # If we don't have a bye or it's not being paired during this iteration
-        # just pair the next two players and move along.
-        else:
-            pair = (
-                standings[i][0],
-                standings[i][1],
-                standings[i+1][0],
-                standings[i+1][1]
-            )
-
-            # skip ahead two since we've paired two players
-            i += 2
-
-        # Append the main pair
-        pairs.append(pair)
-
-    # After the loop runs, append the bye pair if one exists
-    if byePair:
-        pairs.append(byePair)
-
-    # Convert the pairs array to a tuple as the requirements suggest.
-    tuple(pairs)
-    return pairs
-
+    connection.close()
+    return pairings
 
