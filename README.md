@@ -1,106 +1,61 @@
-# Tournament_Udacity
-The project have a database schema for data storage necessary to run a simple Swiss pairing tournament.
+# Tournament Results
+https://www.udacity.com/course/viewer#!/c-ud197-nd/  
+Udacity Full Stack developer project 2
 
-Tournament Results Project
-***************************************************************************************************************************************
+## Project Specification
 
-## Overview
+Develop a database schema to store details of a games matches between players.   
+Then write a Python module to rank the players and pair them up in matches in a tournament.
 
-The project have a database schema for data storage necessary to run a simple Swiss pairing tournament.
+## Files 
 
-## python modules
+**tournament.py**  
 
-include modules to add players, report games played, rank players and create player match ups.
+Contains the implementation for the Swiss tournament  
 
-## Requirements
+**tournament.sql**  
 
-[PostgreSQL](http://www.postgresql.org/) and [Python](https://www.python.org/) must be installed to use this code.
+Contains the SQL queries to create the database, tables and views   
 
-## Installation
+**tournament_test.py**  
 
-### 1. Data structure/storage set up
+Contains the test cases for tournament.py  
 
-When you are done downloading data to your PC, type the following in the terminal for the project to set up the database schema:
+## Prerequisites 
 
-*NB: This will overwrite any previous database you have on your PC named, "tournament," so run with care.*
+The latest vagrant build for the Udacity tournament project. (In project notes)
 
-```
-psql -f tournament.sql
-```
+## Instructions
 
-### 2. Run the tests
+1. Start Vagrant
+  1. Open Terminal or cmd and browse to the vagrant folder
+  2. Type `vagrant up`
+2. SSH in to the vagrant VM
+  1. In the same terminal type `vagrant ssh`
+3. Change to the correct folder
+  1. Type `cd /vagrant/tournament`
+4. Open PSQL and run the tournament.sql 
+  1. type `psql`
+  2. copy the contents of tournament.sql and paste in to the terminal window
+  3. type `\q` to quit out of PSQL 
+5. Run the tests
+  1. In the terminal type `python tournament_test.py`
 
-There is a set of tests in the project to make sure the code is working perfectly. From the project directory type the following command to run the test suite:
+## Expected Outcome
 
-```
-python tournament_test.py
-```
+Success!  All tests pass!  
+vagrant@vagrant-ubuntu-trusty-32:/vagrant/tournament$ python tournament_test.py  
+1. Old matches can be deleted.  
+2. Player records can be deleted.  
+3. After deleting, countPlayers() returns zero.  
+4. After registering a player, countPlayers() returns 1.  
+5. Players can be registered and deleted.  
+6. Newly registered players appear in the standings with no matches.  
+7. After a match, players have updated standings.  
+8. After one match, players with one win are paired.  
+Success!  All tests pass!  
 
-If everything is set up correctly, you should see the following result:
+## Extra Credit
 
-```
-1. Old matches can be deleted.
-2. Player records can be deleted.
-3. After deleting, countPlayers() returns zero.
-4. After registering a player, countPlayers() returns 1.
-5. Players can be registered and deleted.
-6. Newly registered players appear in the standings with no matches.
-7. After a match, players have updated standings.
-8. After one match, players with one win are paired.
-Success!  All tests pass!
-```
-
-## How to use this project
-
-Run this program from within a python prompt, using the following commands:
-
-```
-from tournament import *
-```
-
-### Reset tournament data
-
-To delete matches tournament data, run:
-
-```
-deleteMatches()
-```
-To delete players tournament data, run:
-```
-deletePlayers()
-```
-
-### Register new players
-
-To register new players run `registerPlayer(name)`.
-
-**Example:** Registering a player named Tunde Lemo
-```
-registerPlayer('Tunde Lemo')
-```
-
-### Creating match ups
-
-Make use of the `swissPairings()` function to create a list of match ups for a round of the tournament, which will return an list of match ups containing the unique id of each player and name.
-
-If an odd number of players exist, one will be assigned a bye.
-
-### Reporting matches
-
-To report the results of a match, use `reportMatch(winner, loser)`, where winner and loser are the unique ids of the winner and loser of the match, respectively.
-
-**Example:** Rose, whose ID is 17, beats Kennedy, whose ID is 15.
-```
-reportMatch(17, 15)
-```
-
-To report the results of player who had been assigned a bye, use `reportMatch()` with that player listed as the winner and `None` listed as the loser.
-
-**Example:** Reporting a bye to a player whose player ID is 29.
-```
-reportMatch(29, None)
-```
-
-### Get current standings
-
-To return a list of current standings, based on number of wins, use the `playerStandings()` function.
+If the top two players have the same won match count, and have won more than 0 games, then 
+the standings is ordered by total number of wins by games played in descending order.
